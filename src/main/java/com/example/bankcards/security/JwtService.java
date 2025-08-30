@@ -1,11 +1,14 @@
 package com.example.bankcards.security;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,16 +22,34 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtService {
     
+    @Value("${jwt.secret}")
     private String SECRET;
 
-    public String generateToken(Map<String, Object> claims, UserDetails details) {
+    @Value("${jwt.accessExpiration}")
+    private Duration ACCESS_EXPIRATION;
+
+    @Value("${jwt.refreshExpiration}")
+    private Duration REFRESH_EXPIRATION;
+
+    public String generateAccessToken(Map<String, Object> claims, UserDetails details) {
+        return buildToken(claims, details, ACCESS_EXPIRATION);
+    }
+
+    public String generateRefreshToken(UserDetails details) {
+        return buildToken(Map.of(), details, REFRESH_EXPIRATION);
+    }
+
+    public String generateRefreshToken(Map<String, Object> claims, UserDetails details) {
+        return buildToken(claims, details, REFRESH_EXPIRATION);
+    }
+
+    private String buildToken(Map<String, Object> claims, UserDetails details, Duration expiration) {
         return Jwts
             .builder()
             .claims(claims)
-            .subject((details).getUsername())
+            .subject(details.getUsername())
             .issuedAt(new Date(System.currentTimeMillis()))
-            // TODO: Вынести срок токена в параметры окружения
-            .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 100))
+            .expiration(new Date(System.currentTimeMillis() + expiration.toMillis()))
             .signWith(getSigningKey(), Jwts.SIG.HS256)
             .compact();
     }
@@ -44,14 +65,43 @@ public class JwtService {
     
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-        .verifyWith(getSigningKey())
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();    
+            .verifyWith(getSigningKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();    
     }
 
     private SecretKey getSigningKey() {
         byte[] bytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(bytes);
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public Duration getAccessExpiration() {
+        return ACCESS_EXPIRATION;
+    }
+
+    public Duration getRefreshExpiration() {
+        return REFRESH_EXPIRATION;
+    }
+
+    public Instant getAccessExpirationInstant() {
+        return Instant.now().plus(ACCESS_EXPIRATION);
+    }
+
+    public Instant getRefreshExpirationInstant() {
+        return Instant.now().plus(REFRESH_EXPIRATION);
     }
 }

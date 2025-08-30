@@ -27,3 +27,5 @@ springdoc:
 
 jwt:
   secret: ${JWT_SECRET}
+  accessExpiration: 24h
+  refreshExpiration: 7d
