@@ -3,6 +3,7 @@ package com.example.bankcards.security;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -31,12 +32,12 @@ public class JwtService {
     @Value("${jwt.refreshExpiration}")
     private Duration REFRESH_EXPIRATION;
 
-    public String generateAccessToken(Map<String, Object> claims, UserDetails details) {
-        return buildToken(claims, details, ACCESS_EXPIRATION);
+    public String generateAccessToken(UserDetails details) {
+        return buildToken(new HashMap<>(), details, ACCESS_EXPIRATION);
     }
 
     public String generateRefreshToken(UserDetails details) {
-        return buildToken(Map.of(), details, REFRESH_EXPIRATION);
+        return buildToken(new HashMap<>(), details, REFRESH_EXPIRATION);
     }
 
     public String generateRefreshToken(Map<String, Object> claims, UserDetails details) {
@@ -81,7 +82,7 @@ public class JwtService {
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
