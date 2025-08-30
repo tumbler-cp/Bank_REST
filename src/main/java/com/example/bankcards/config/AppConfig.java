@@ -56,6 +56,7 @@ public class AppConfig {
             .scheme("Bearer");
     }
 
+    @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement()
         .addList("Bearer Authentication"))

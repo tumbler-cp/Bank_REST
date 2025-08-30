@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class RefreshTokenService {
 
     private final JwtService jwtService;
-    private RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public void revokeToken(String token) {
