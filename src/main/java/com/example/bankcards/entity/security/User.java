@@ -36,12 +36,13 @@ public class User implements UserDetails {
 
     @NotNull
     @NotBlank
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @NotNull
     @NotBlank
     @Size(min = 8)
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -51,7 +52,5 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
-
-    
     
 }
