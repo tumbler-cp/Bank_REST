@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers("/swagger-ui/**")
                 .permitAll()
+                .requestMatchers("/swagger-ui")
+                .permitAll()
                 .requestMatchers("/docs/**")
                 .permitAll()
                 .requestMatchers("/actuator/**")

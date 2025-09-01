@@ -31,6 +31,8 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       JWT_SECRET: ${JWT_SECRET}
       ENCRYPTION_SECRET: ${ENCRYPTION_SECRET}
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_PASS: ${ADMIN_PASS}
     ports:
       - "8080:8080"
     depends_on:

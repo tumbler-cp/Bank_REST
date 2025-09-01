@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-public class AdminUserController {
+public class AdminUsersController {
     private final AdminUserService adminUserService;
 
     @PostMapping("/new")

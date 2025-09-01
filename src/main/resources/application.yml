@@ -33,3 +33,7 @@ jwt:
 encryption:
   algorithm: AES 
   secret: ${ENCRYPTION_SECRET}
+
+admin:
+  name: ${ADMIN_NAME}
+  pass: ${ADMIN_PASS}
