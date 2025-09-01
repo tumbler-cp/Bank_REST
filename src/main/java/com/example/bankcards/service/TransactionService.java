@@ -3,7 +3,9 @@ package com.example.bankcards.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +32,7 @@ public class TransactionService {
 
     public TransactionResponse processTransaction(TransactionRequest request) {
         var transaction = createAndProcessTransaction(request);
-        return TransactionResponse.builder()
-            .id(transaction.getId())
-            .from(cardResponseFactory.fromCard(transaction.getFrom()))
-            .to(cardResponseFactory.fromCard(transaction.getTo()))
-            .amount(transaction.getAmount())
-            .timestamp(transaction.getTimestamp())
-            .status(transaction.getStatus())
-            .build();
+        return entityToDto(transaction);
     }
 
     @Transactional
@@ -107,6 +102,24 @@ public class TransactionService {
             throw new RuntimeException("Transaction between same card is not allowed");
         }
 
+    }
+
+    private TransactionResponse entityToDto(Transaction transaction) {
+        return TransactionResponse.builder()
+            .id(transaction.getId())
+            .from(cardResponseFactory.fromCard(transaction.getFrom()))
+            .to(cardResponseFactory.fromCard(transaction.getTo()))
+            .amount(transaction.getAmount())
+            .timestamp(transaction.getTimestamp())
+            .status(transaction.getStatus())
+            .build();
+    }
+
+    public List<TransactionResponse> getAll(Pageable pageable) {
+        var transactions = transactionRepository.findAll(pageable);
+        return transactions.stream().map(
+            transaction -> entityToDto(transaction)
+        ).toList();
     }
 
 }

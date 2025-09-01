@@ -1,0 +1,37 @@
+{"properties": [
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "A secret key for jwt secret"
+  },
+  {
+    "name": "jwt.accessExpiration",
+    "type": "java.lang.String",
+    "description": "Expiration time of access tokens"
+  },
+  {
+    "name": "jwt.refreshExpiration",
+    "type": "java.lang.String",
+    "description": "Expiration time of refresh tokens"
+  },
+  {
+    "name": "encryption.algorithm",
+    "type": "java.lang.String",
+    "description": "Bank card number encryption algorithm"
+  },
+  {
+    "name": "encryption.secret",
+    "type": "java.lang.String",
+    "description": "A secret for bank card encryption"
+  },
+  {
+    "name": "admin.name",
+    "type": "java.lang.String",
+    "description": "Init admin user name"
+  },
+  {
+    "name": "admin.pass",
+    "type": "java.lang.String",
+    "description": "Init admin user password"
+  }
+]}

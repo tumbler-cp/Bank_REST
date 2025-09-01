@@ -11,6 +11,7 @@ import com.example.bankcards.dto.request.security.AuthRequest;
 import com.example.bankcards.dto.response.security.TokenResponse;
 import com.example.bankcards.entity.security.Role;
 import com.example.bankcards.entity.security.User;
+import com.example.bankcards.repository.RefreshTokenRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.JwtService;
 import com.example.bankcards.security.RefreshTokenService;
@@ -27,6 +28,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     public User createUser(AuthRequest request) {
@@ -61,6 +63,16 @@ public class AuthService {
         return userRepository.findByUsername(
             SecurityContextHolder.getContext().getAuthentication().getName()
         );
+    }
+
+    public TokenResponse refreshTokens(String token) {
+        refreshTokenRepository.findByToken(token).orElseThrow(
+            () -> new RuntimeException("No such refresh token")
+        );
+        if (jwtService.isTokenExpired(token)) {
+            throw new RuntimeException("Refresh token is expired");
+        }
+        return generateTokenResponse(getCurrentUser());
     }
 
     private TokenResponse generateTokenResponse(User user) {
