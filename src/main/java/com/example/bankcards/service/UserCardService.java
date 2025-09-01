@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.bankcards.dto.response.app.CardResponse;
 import com.example.bankcards.entity.app.Card;
 import com.example.bankcards.entity.security.User;
+import com.example.bankcards.exception.CardNotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.util.CardResponseFactory;
 
@@ -32,7 +33,7 @@ public class UserCardService {
     public Card findUserCard(Long cardId) {
         User user = authService.getCurrentUser();
         var card = cardRepository.findByOwnerAndId(user, cardId)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new CardNotFoundException());
         return card;
     }
 

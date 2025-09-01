@@ -9,10 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.bankcards.dto.request.app.CardRequest;
 import com.example.bankcards.dto.response.app.CardResponse;
-import com.example.bankcards.entity.app.BlockRequest;
 import com.example.bankcards.entity.app.Card;
 import com.example.bankcards.entity.app.CardBlockRequestStatus;
 import com.example.bankcards.entity.app.CardStatus;
+import com.example.bankcards.exception.CardNotFoundException;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.repository.BlockRequestRepository;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
@@ -49,7 +50,7 @@ public class AdminCardService {
                     .owner(
                         userRepository.findById(
                             cardRequest.getUserId()
-                        ).orElseThrow(() -> new RuntimeException("User not found"))
+                        ).orElseThrow(() -> new UserNotFoundException())
                     )
                     .build()
             )
@@ -84,7 +85,7 @@ public class AdminCardService {
 
     public void deleteCard(Long cardId) {
         var card = cardRepository.findById(cardId)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new CardNotFoundException());
         cardRepository.delete(card);
     }
 

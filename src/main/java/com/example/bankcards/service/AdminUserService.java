@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.bankcards.dto.request.security.AuthRequest;
 import com.example.bankcards.dto.response.security.UserResponse;
 import com.example.bankcards.entity.security.User;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class AdminUserService {
 
     public void deleteUser(Long userId) {
         var user = userRepository.findById(userId)
-            .orElseThrow(RuntimeException::new);
+            .orElseThrow(() -> new UserNotFoundException());
         userRepository.delete(user);
     }
 

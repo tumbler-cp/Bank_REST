@@ -140,11 +140,10 @@ class TransactionServiceTest {
         when(authService.getCurrentUser()).thenReturn(testUser);
         when(cardRepository.findByOwnerAndId(testUser, 1L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             transactionService.createAndProcessTransaction(validRequest);
         });
         
-        assertEquals("Source card not found", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
     }
 
@@ -154,11 +153,10 @@ class TransactionServiceTest {
         when(cardRepository.findByOwnerAndId(testUser, 1L)).thenReturn(Optional.of(activeCard1));
         when(cardRepository.findByOwnerAndId(testUser, 2L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             transactionService.createAndProcessTransaction(validRequest);
         });
         
-        assertEquals("Destination card not found", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
     }
 
@@ -177,7 +175,7 @@ class TransactionServiceTest {
             transactionService.createAndProcessTransaction(validRequest);
         });
         
-        assertEquals("Error while processing transaction: Source card is not active", exception.getMessage());
+        assertEquals("Source card is not active", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
         verify(transactionRepository, atLeast(2)).save(any(Transaction.class));
     }
@@ -197,7 +195,7 @@ class TransactionServiceTest {
             transactionService.createAndProcessTransaction(validRequest);
         });
         
-        assertEquals("Error while processing transaction: Source card is expired", exception.getMessage());
+        assertEquals("Source card is expired", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
     }
 
@@ -216,7 +214,7 @@ class TransactionServiceTest {
             transactionService.createAndProcessTransaction(invalidAmountRequest);
         });
         
-        assertEquals("Error while processing transaction: Transaction amount should be positive", exception.getMessage());
+        assertEquals("Transaction amount should be positive", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
     }
 
@@ -241,7 +239,7 @@ class TransactionServiceTest {
             transactionService.createAndProcessTransaction(largeAmountRequest);
         });
         
-        assertEquals("Error while processing transaction: Not enough balance", exception.getMessage());
+        assertEquals("Not enough balance", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
     }
 
@@ -265,7 +263,7 @@ class TransactionServiceTest {
             transactionService.createAndProcessTransaction(sameCardRequest);
         });
         
-        assertEquals("Error while processing transaction: Transaction between same card is not allowed", exception.getMessage());
+        assertEquals("Transaction between same card is not allowed", exception.getMessage());
         verify(cardRepository, never()).saveAll(anyList());
     }
 
@@ -346,11 +344,10 @@ class TransactionServiceTest {
         
         doThrow(new RuntimeException("Database error")).when(cardRepository).saveAll(anyList());
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             transactionService.createAndProcessTransaction(validRequest);
         });
         
-        assertTrue(exception.getMessage().contains("Error while processing transaction"));
         
         verify(transactionRepository, atLeast(2)).save(argThat(transaction -> 
             transaction.getStatus() == TransactionStatus.FAILED

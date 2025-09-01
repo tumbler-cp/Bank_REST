@@ -38,6 +38,22 @@ logging:
           controller: DEBUG
           service: DEBUG
 
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude:
+          - metrics
+  defaults:
+    metrics:
+      export:
+        enabled: false
+
+  metrics:
+    enable:
+      system: false
+      process: false
+
 jwt:
   secret: ${JWT_SECRET}
   accessExpiration: 24h

@@ -17,6 +17,8 @@ import com.example.bankcards.entity.app.CardStatus;
 import com.example.bankcards.entity.app.Transaction;
 import com.example.bankcards.entity.app.TransactionStatus;
 import com.example.bankcards.entity.security.User;
+import com.example.bankcards.exception.CardNotFoundException;
+import com.example.bankcards.exception.ValidationException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.TransactionRepository;
 import com.example.bankcards.util.CardResponseFactory;
@@ -42,9 +44,9 @@ public class TransactionService {
         User user = authService.getCurrentUser();
         
         Card fromCard = cardRepository.findByOwnerAndId(user, request.getFromCardId())
-                .orElseThrow(() -> new RuntimeException("Source card not found"));
+                .orElseThrow(() -> new CardNotFoundException());
         Card toCard = cardRepository.findByOwnerAndId(user, request.getToCardId())
-                .orElseThrow(() -> new RuntimeException("Destination card not found"));
+                .orElseThrow(() -> new CardNotFoundException());
 
         Transaction transaction = Transaction.builder()
             .from(fromCard)
@@ -63,7 +65,7 @@ public class TransactionService {
             transaction.setStatus(TransactionStatus.SUCCESS);
         } catch (Exception e) {
             transaction.setStatus(TransactionStatus.FAILED);
-            throw new RuntimeException("Error while processing transaction: " + e.getMessage(), e);
+            throw e;
         } finally {
             transactionRepository.save(transaction);
         }
@@ -85,25 +87,25 @@ public class TransactionService {
 
     private void validateTransaction(Card from, Card to, BigDecimal amount) {
         if (from.getStatus() != CardStatus.ACTIVE) {
-            throw new RuntimeException("Source card is not active");
+            throw new ValidationException("Source card is not active");
         }
         if (to.getStatus() != CardStatus.ACTIVE) {
-            throw new RuntimeException("Destination card is not active");
+            throw new ValidationException("Destination card is not active");
         }
         if (from.getExpiryDate().isBefore(LocalDate.now())) {
-            throw new RuntimeException("Source card is expired");
+            throw new ValidationException("Source card is expired");
         }
         if (to.getExpiryDate().isBefore(LocalDate.now())) {
-            throw new RuntimeException("Destination card is expired");
+            throw new ValidationException("Destination card is expired");
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Transaction amount should be positive");
+            throw new ValidationException("Transaction amount should be positive");
         }
         if (from.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Not enough balance");
+            throw new ValidationException("Not enough balance");
         }
         if (from.equals(to)) {
-            throw new RuntimeException("Transaction between same card is not allowed");
+            throw new ValidationException("Transaction between same card is not allowed");
         }
     }
 
