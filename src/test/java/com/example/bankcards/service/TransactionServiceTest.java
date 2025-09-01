@@ -278,10 +278,9 @@ class TransactionServiceTest {
             return transaction;
         });
         
-        when(cardRepository.saveAll(any(Iterable.class))).thenAnswer(invocation -> {
-            Iterable<Card> cards = invocation.getArgument(0);
-            return cards;
-        });
+        when(cardRepository.saveAll(any())).thenAnswer(invocation -> 
+            invocation.getArgument(0)
+        );
 
         BigDecimal initialFromBalance = activeCard1.getBalance();
         BigDecimal initialToBalance = activeCard2.getBalance();
