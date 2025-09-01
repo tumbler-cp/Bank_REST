@@ -5,6 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.bankcards.dto.request.security.AuthRequest;
 import com.example.bankcards.dto.response.security.TokenResponse;
@@ -16,6 +17,7 @@ import com.example.bankcards.security.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -27,14 +29,19 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
 
-    public TokenResponse signUp(AuthRequest request) {
+    public User createUser(AuthRequest request) {
         var user = User
             .builder()
             .username(request.getUsername())
             .password(passwordEncoder.encode(request.getPassword()))
             .role(Role.USER)
             .build();
-        user = userRepository.save(user);
+        return userRepository.save(user);
+            
+    }
+
+    public TokenResponse signUp(AuthRequest request) {
+        var user = createUser(request);
         return generateTokenResponse(user);
     }
 
@@ -43,15 +50,17 @@ public class AuthService {
             new UsernamePasswordAuthenticationToken(
                 request.getUsername(), request.getPassword())
         );
-        var user = userRepository.findByUsername(request.getUsername())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        var user = userRepository.findByUsername(request.getUsername());
+        if (user == null) throw new RuntimeException("User not found");
+
         return generateTokenResponse(user);
     }
 
     public User getCurrentUser() {
         return userRepository.findByUsername(
             SecurityContextHolder.getContext().getAuthentication().getName()
-        ).orElseThrow(() -> new RuntimeException("Server error: user not found"));
+        );
     }
 
     private TokenResponse generateTokenResponse(User user) {
