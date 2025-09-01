@@ -25,6 +25,13 @@ springdoc:
     enabled: true
     path: /docs
 
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        web: DEBUG
+
 jwt:
   secret: ${JWT_SECRET}
   accessExpiration: 24h

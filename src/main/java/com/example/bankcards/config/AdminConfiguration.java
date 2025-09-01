@@ -29,14 +29,14 @@ public class AdminConfiguration implements ApplicationListener<ContextRefreshedE
 
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
-        if (!userRepository.findByRole(Role.ADMIN).isEmpty()) return;
+        if (!userRepository.findByRole(Role.ROLE_ADMIN).isEmpty()) return;
         User user = authService.createUser(
             AuthRequest.builder()
                 .username(adminName)
                 .password(adminPass)
                 .build()
         );
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.ROLE_ADMIN);
         userRepository.save(user);
     }
 

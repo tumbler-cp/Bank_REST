@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,17 +20,22 @@ import com.example.bankcards.dto.response.security.UserResponse;
 import com.example.bankcards.service.AdminUserService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@Slf4j
 public class AdminUsersController {
     private final AdminUserService adminUserService;
 
     @PostMapping("/new")
-    public UserResponse createUser(@RequestBody AuthRequest newUser) {
-        return adminUserService.createUser(newUser);
+    public ResponseEntity<UserResponse> createUser(
+        @RequestBody @Valid AuthRequest newUser) {
+        log.info("Received new user: {}", newUser);
+        return new ResponseEntity<UserResponse>(adminUserService.createUser(newUser), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/delete")
