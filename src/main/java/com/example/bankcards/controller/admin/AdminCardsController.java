@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bankcards.dto.request.app.CardRequest;
+import com.example.bankcards.dto.response.app.BlockRequestResponse;
 import com.example.bankcards.dto.response.app.CardResponse;
 import com.example.bankcards.entity.app.CardStatus;
 import com.example.bankcards.service.AdminCardService;
+import com.example.bankcards.service.BlockRequestService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminCardsController {
     private final AdminCardService adminCardService;
+    private final BlockRequestService blockRequestService;
 
     @PostMapping("/new")
     public CardResponse createCard(@RequestBody @Valid CardRequest cardRequest) {
@@ -59,6 +62,17 @@ public class AdminCardsController {
         Order order = new Order(Sort.Direction.fromString(sort[1]), sort[0]);
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(order));
         return adminCardService.getAllCards(pageable);
+    }
+
+    @GetMapping("/blocks")
+    public List<BlockRequestResponse> getBlockRequests(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "pageSize", defaultValue = "5") int pageSize,
+        @RequestParam(name = "sort", defaultValue = "id,asc") String[] sort
+    ) {
+        Order order = new Order(Sort.Direction.fromString(sort[1]), sort[0]);
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(order));
+        return blockRequestService.getAllRequests(pageable);
     }
 
 }

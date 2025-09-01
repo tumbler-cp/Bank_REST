@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.bankcards.dto.response.app.CardResponse;
+import com.example.bankcards.entity.app.Card;
 import com.example.bankcards.entity.security.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.util.CardResponseFactory;
@@ -29,11 +30,15 @@ public class UserCardService {
         );
     }
 
-    public CardResponse findUserCard(Long cardId) {
+    public Card findUserCard(Long cardId) {
         User user = authService.getCurrentUser();
         var card = cardRepository.findByOwnerAndId(user, cardId)
             .orElseThrow(() -> new RuntimeException("Card not found"));
-        return cardResponseFactory.fromCard(card);
+        return card;
+    }
+
+    public CardResponse getUserCard(Long cardId) {
+        return cardResponseFactory.fromCard(findUserCard(cardId));
     }
 
 }

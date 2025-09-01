@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import com.example.bankcards.dto.request.app.CardRequest;
 import com.example.bankcards.dto.response.app.CardResponse;
 import com.example.bankcards.entity.app.Card;
+import com.example.bankcards.entity.app.CardBlockRequestStatus;
 import com.example.bankcards.entity.app.CardStatus;
+import com.example.bankcards.repository.BlockRequestRepository;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardNumberEncryption;
@@ -28,6 +30,7 @@ public class AdminCardService {
     private final CardRepository cardRepository;
     private final CardResponseFactory cardResponseFactory;
     private final CardNumberEncryption cardNumberEncryption;
+    private final BlockRequestRepository blockRequestRepository;
 
     public CardResponse create(CardRequest cardRequest) {
         return cardResponseFactory.fromCard(
@@ -52,10 +55,17 @@ public class AdminCardService {
     public CardResponse updateCardStatus(Long cardId, CardStatus cardStatus) {
         var card = cardRepository.findById(cardId).orElseThrow(() -> new RuntimeException("Card not found"));
         card.setId(cardId);
+        card = cardRepository.save(card);
+        if (card.getStatus() == CardStatus.BLOCKED) {
+            var br = blockRequestRepository.findById(card.getId());
+            if (br.isPresent()) {
+                var res = br.get();
+                res.setStatus(CardBlockRequestStatus.APPROVED);
+                blockRequestRepository.save(res);
+            }
+        }
         return cardResponseFactory.fromCard(
-            cardRepository.save(
-                card
-            )
+            card
         );
     }
 
