@@ -31,9 +31,9 @@ public class UserCardService {
 
     public CardResponse findUserCard(Long cardId) {
         User user = authService.getCurrentUser();
-        var card = cardRepository.findByOwnerAndId(user, cardId);
-        if (card.size() == 0) throw new RuntimeException("Card not found");
-        return cardResponseFactory.fromCard(card.get(0));
+        var card = cardRepository.findByOwnerAndId(user, cardId)
+            .orElseThrow(() -> new RuntimeException("Card not found"));
+        return cardResponseFactory.fromCard(card);
     }
 
 }

@@ -3,6 +3,8 @@ package com.example.bankcards.entity.app;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.bankcards.entity.security.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,4 +49,8 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionStatus status;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User user;
 }
