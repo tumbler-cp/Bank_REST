@@ -44,6 +44,7 @@ public class BlockRequestService {
     private BlockRequestResponse entityToDto(BlockRequest blockRequest) {
         return BlockRequestResponse.builder()
             .id(blockRequest.getId())
+            .cardId(blockRequest.getCard().getId())
             .maskedNumber(
                 cardNumberEncryption.maskCardNumber(
                     cardNumberEncryption.decryptCardNumber(blockRequest.getCard().getNumber())

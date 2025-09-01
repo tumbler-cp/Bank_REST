@@ -9,20 +9,25 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.bankcards.dto.response.app.BlockRequestResponse;
 import com.example.bankcards.dto.response.app.CardResponse;
+import com.example.bankcards.service.BlockRequestService;
 import com.example.bankcards.service.UserCardService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/usercards")
 @RequiredArgsConstructor
 public class UserCardController {
     private final UserCardService cardService;
+    private final BlockRequestService blockRequestService;
     
 
     @GetMapping("/cards")
@@ -43,6 +48,13 @@ public class UserCardController {
         return ResponseEntity.ok().body(
             cardService.findUserCard(id).getBalance()
         );
+    }
+
+    @PostMapping("/block")
+    public BlockRequestResponse blockCardRequest(
+        @RequestBody Long cardId
+    ) {
+        return blockRequestService.createBlockRequst(cardId);
     }
     
 }

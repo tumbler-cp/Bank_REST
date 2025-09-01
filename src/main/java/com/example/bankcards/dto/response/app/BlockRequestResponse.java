@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BlockRequestResponse {
     private Long id;
+    private Long cardId;
     private String maskedNumber;
     private CardBlockRequestStatus status;
 }

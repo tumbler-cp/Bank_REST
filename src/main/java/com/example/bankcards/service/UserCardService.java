@@ -26,7 +26,6 @@ public class UserCardService {
         User user = authService.getCurrentUser();
         return cardResponseFactory.fromList(
             cardRepository.findByOwner(user, pageable)
-                .toList()
         );
     }
 

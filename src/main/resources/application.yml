@@ -30,12 +30,13 @@ logging:
     org:
       springframework:
         security: DEBUG
-        web: DEBUG
-  
+        web: INFO
+
     com:
       example:
         bankcards:
           controller: DEBUG
+          service: DEBUG
 
 jwt:
   secret: ${JWT_SECRET}
@@ -43,7 +44,7 @@ jwt:
   refreshExpiration: 7d
 
 encryption:
-  algorithm: AES 
+  algorithm: AES
   secret: ${ENCRYPTION_SECRET}
 
 admin:
