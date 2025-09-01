@@ -2,6 +2,7 @@ package com.example.bankcards.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +43,15 @@ public class AuthService {
             new UsernamePasswordAuthenticationToken(
                 request.getUsername(), request.getPassword())
         );
-        var user = userRepository.findByUsername(request.getUsername());
+        var user = userRepository.findByUsername(request.getUsername())
+            .orElseThrow(() -> new RuntimeException("User not found"));
         return generateTokenResponse(user);
+    }
+
+    public User getCurrentUser() {
+        return userRepository.findByUsername(
+            SecurityContextHolder.getContext().getAuthentication().getName()
+        ).orElseThrow(() -> new RuntimeException("Server error: user not found"));
     }
 
     private TokenResponse generateTokenResponse(User user) {
@@ -57,6 +65,5 @@ public class AuthService {
             .refreshToken(refreshToken)
             .build();
     }
-
 
 }
