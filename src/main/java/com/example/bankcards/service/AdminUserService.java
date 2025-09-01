@@ -36,6 +36,12 @@ public class AdminUserService {
         return users.map(user -> entityToDto(user)).toList();
     }
 
+    public void deleteUser(Long userId) {
+        var user = userRepository.findById(userId)
+            .orElseThrow(RuntimeException::new);
+        userRepository.delete(user);
+    }
+
     private UserResponse entityToDto(User user) {
         return UserResponse.builder()
             .id(user.getId())
